@@ -21,7 +21,6 @@ RUN sed -i 's!/var/www/html!/var/www/html/public!' /etc/apache2/sites-available/
 
 RUN a2enmod rewrite
 
-RUN php artisan key:generate
 
 EXPOSE 8080
 
