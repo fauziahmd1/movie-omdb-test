@@ -24,11 +24,15 @@ RUN composer install --no-dev --optimize-autoloader
 # Set Apache DocumentRoot to public folder
 RUN sed -i 's!/var/www/html!/var/www/html/public!' /etc/apache2/sites-available/000-default.conf
 
+# Disable conflicting MPM modules & enable prefork
+RUN a2dismod mpm_event mpm_worker \
+    && a2enmod mpm_prefork
+
 # Enable Apache rewrite module
 RUN a2enmod rewrite
 
 # Expose port
 EXPOSE 8080
 
-# Start Apache in foreground (default)
+# Start Apache in foreground
 CMD ["apache2-foreground"]
