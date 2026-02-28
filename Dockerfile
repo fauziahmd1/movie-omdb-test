@@ -1,15 +1,9 @@
 FROM php:7.4-apache
 
 RUN apt-get update && apt-get install -y \
-    libzip-dev \
-    unzip \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
+    libzip-dev unzip git curl libpng-dev libonig-dev \
     && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath gd \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
 COPY . /var/www/html
@@ -19,9 +13,9 @@ RUN composer install --no-dev --optimize-autoloader
 
 RUN sed -i 's!/var/www/html!/var/www/html/public!' /etc/apache2/sites-available/000-default.conf
 
-# Pastikan hanya prefork yang aktif
-RUN a2dismod mpm_event mpm_worker mpm_prefork || true \
-    && a2enmod mpm_prefork rewrite
+# Disable semua MPM default secara paksa, lalu enable prefork + rewrite
+RUN a2dismod mpm_event mpm_worker || true
+RUN a2enmod mpm_prefork rewrite
 
 EXPOSE 8080
 CMD ["apache2-foreground"]
